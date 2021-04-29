@@ -1,0 +1,23 @@
+body, html{
+    margin-top: 5%;
+    background-image: url("Background-snake\ game.jpg");
+}
+
+#container {
+    display: flex;
+    justify-content: center;
+}
+
+h2{
+    text-align: center;
+    color: aqua;
+    font-size: 45px;
+}
+
+#score{
+    border: 2px solid rgb(247, 5, 5);
+    margin: auto;
+    width: 120px;
+    color: aqua;
+    padding: 10px;
+}
