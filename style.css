@@ -1,6 +1,8 @@
 body, html{
-    margin-top: 5%;
+    margin-top: 2%;
     background-image: url("Background-snake\ game.jpg");
+    background-repeat: none;
+    width: auto;
 }
 
 #container {
