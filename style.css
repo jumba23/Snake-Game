@@ -6,6 +6,7 @@ body, html{
 #container {
     display: flex;
     justify-content: center;
+
 }
 
 h2{
@@ -15,9 +16,27 @@ h2{
 }
 
 #score{
+    opacity: 0.8;
     border: 2px solid rgb(247, 5, 5);
     margin: auto;
-    width: 120px;
+    width: 600px;
     color: aqua;
-    padding: 10px;
+    background-color: brown;
+    padding: 10px 0px 10px 0px;
+    display: flex;
+    font-weight: bold;
+}
+
+label[for="highScore"]{
+    margin-left: auto;
+    }
+
+span{
+    padding-left: 30px;
+}
+
+canvas{
+    opacity: 0.7;
+    background-color: #070707;
+    margin-bottom: 5px;
 }
