@@ -2,6 +2,8 @@ const canvas = document.getElementById('game-board');
 const ctx = canvas.getContext('2d');
 
 const gridSize = 40;
+let quadrant = 0;
+
 
 const appleLocation = {
     x: 360,
@@ -11,10 +13,13 @@ const appleLocation = {
 const snakeHead = {
     x: 160,
     y: 120,
-    speed: 4,
-    dx: 40,
-    dy: 40
-
+    speed: 1.75,
+    dx: 1.75,
+    dy: 0,
+    moveUp: false,
+    moveDown: false,
+    moveLeft: false,
+    moveRight: true,
 }
 
 function drawApple() {
@@ -42,7 +47,13 @@ function startScreen(){
     ctx.fillText("Use ARROWS to move the snake", 80,350);
 
     const arrowsPicture = document.getElementById("arrows");
-    ctx.drawImage(arrowsPicture, 350, 300);    
+    ctx.drawImage(arrowsPicture, 350, 300);  
+    
+    document.addEventListener('keyup', (e) => { 
+        if(e.key === ' ' || e.key === 'Space'){
+        playGame();
+        } 
+    });
 
   }
 
@@ -80,34 +91,92 @@ function moveApple(){
 
 // setInterval(moveApple, 10000);
 
+
+
 function moveSnakeHead (){
-    
-        snakeHead.y -= snakeHead.dy;
-  
-        snakeHead.y += snakeHead.dy;
-   
-        snakeHead.x -= snakeHead.dx;
-  
-        snakeHead.x += snakeHead.dx;
-
-        // detectWallsBall();
+        if(snakeHead.moveUp){
+            snakeHead.y -= snakeHead.dy; 
+        } else if(snakeHead.moveDown){
+            snakeHead.y += snakeHead.dy;
+        } else if(snakeHead.moveLeft){
+            snakeHead.x -= snakeHead.dx;
+        } else if(snakeHead.moveRight){
+            snakeHead.x += snakeHead.dx; 
+        }
+        detectWalls(); 
 }
 
-function snakeDirection(e){
-    if (e.key === 'ArrowUp'){
-        snakeHead.dy = -snakeHead.speed;
-     } else if (e.key === 'ArrowDown'){ 
-        snakeHead.dy = snakeHead.speed;
-    } else if (e.key === 'ArrowLeft'){
-        snakeHead.dx = snakeHead.speed;
-    } else if (e.key === 'ArrowRight'){
-        snakeHead.dx = snakeHead.speed;
+function detectWalls(){
+    if(snakeHead.x < 0 || snakeHead.x + gridSize > canvas.width){
+        snakeHead.dx = 0;
     }
-    // snakeHead.dy = -snakeHead.speed;
+
+    if(snakeHead.y < 0 || snakeHead.y + gridSize > canvas.height){
+        snakeHead.dy = 0;
+    }
 }
 
-function moveDown(){
-    snakeHead.dy = snakeHead.speed;
+// debugger;
+
+function checkTurningPoints(X){
+    const lowValue = 0;
+    const highValue = gridSize;
+    quadrant = Math.ceil(X/ gridSize); 
+ 
+    let turnLocation = ((quadrant * gridSize) - X);
+ 
+    if(turnLocation > lowValue && turnLocation < highValue){ 
+            return true;
+        }   
+}
+
+
+function verticalControl(){
+        if (checkTurningPoints(snakeHead.x)){
+            snakeHead.dx = 0;
+            snakeHead.dy = +snakeHead.speed;
+            snakeHead.x = quadrant * gridSize; 
+            snakeHead.moveLeft = false;
+            snakeHead.moveRight = false; 
+        } 
+}    
+    
+function horizontalControl(){
+        if(checkTurningPoints(snakeHead.y)){
+            snakeHead.dy = 0;
+            snakeHead.dx = +snakeHead.speed;
+            snakeHead.y = quadrant * gridSize; 
+            snakeHead.moveUp = false;
+            snakeHead.moveDown = false;
+        }
+}
+
+
+function arrowKeys(e){
+    if (e.key === 'ArrowUp'){
+            if(!snakeHead.moveDown){
+                snakeHead.moveUp = true;
+                snakeHead.dx = 0;
+                console.log('im here');
+                verticalControl();
+            }
+    } else if (e.key === 'ArrowDown'){
+            if(!snakeHead.moveUp){
+                snakeHead.moveDown = true;
+                verticalControl();
+            }
+    } else if (e.key === 'ArrowLeft'){
+            if(!snakeHead.moveRight){        
+                snakeHead.moveLeft = true;
+                horizontalControl();
+            }
+    } else if (e.key === 'ArrowRight'){
+                
+            if(!snakeHead.moveLeft){
+                snakeHead.moveRight = true;
+                horizontalControl();
+            }
+    }
 }
 
 
@@ -119,26 +188,18 @@ function playGame(){
     clearAll();
 
     drawGameBoard();
-    drawApple();
+    // drawApple();
     drawSnakeHead();
-    moveSnakeHead (); 
+    moveSnakeHead(); 
     requestAnimationFrame(playGame); 
 }
 
-// document.addEventListener('keyup', moveSnakeHead);
-document.addEventListener('keydown', snakeDirection);
+document.addEventListener('keydown', arrowKeys);
 
-
-
+ 
 window.onload = () => {
     // createLocalStorage();
     drawGameBoard();
     startScreen();
-
-    document.addEventListener('keyup', (e) => { 
-        if(e.key === ' ' || e.key === 'Space'){
-        playGame();
-        } 
-    });
-}
+  }
 
