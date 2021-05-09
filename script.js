@@ -3,6 +3,8 @@ const ctx = canvas.getContext('2d');
 
 const gridSize = 40;
 let quadrant = 0;
+let gameScore = 0;
+let gameOver = false;
 
 
 const appleLocation = {
@@ -13,16 +15,12 @@ const appleLocation = {
 const snakeHead = {
     x: 160,
     y: 120,
-    speed: 1.75,
-    dx: 1.75,
-    dy: 0,
-    moveUp: false,
-    moveDown: false,
-    moveLeft: false,
-    moveRight: true,
+    speed: 2,
+    dx: 0,
+    dy: 2,
 }
 
-function drawApple() {
+function drawApple() { 
     const apple = document.getElementById("apple");
        apple.style.display = 'show'; 
     ctx.drawImage(apple, appleLocation.x, appleLocation.y);
@@ -49,13 +47,7 @@ function startScreen(){
     const arrowsPicture = document.getElementById("arrows");
     ctx.drawImage(arrowsPicture, 350, 300);  
     
-    document.addEventListener('keyup', (e) => { 
-        if(e.key === ' ' || e.key === 'Space'){
-        playGame();
-        } 
-    });
-
-  }
+ }
 
 function drawGameBoard(){
     for (let i = 0; i < canvas.height / gridSize; i++) {
@@ -83,26 +75,29 @@ function drawGameBoard(){
 
 
 function moveApple(){
+    
+    if((snakeHead.x >= appleLocation.x - 10 && appleLocation.x + 10 >= snakeHead.x) && (snakeHead.y >= appleLocation.y - 10 && appleLocation.y + 10 >= snakeHead.y)){
+
     const boardWidth = Math.floor(Math.random() * 15);
     const boardHeight = Math.floor(Math.random() * 13);
+
     appleLocation.x = boardWidth * gridSize;
     appleLocation.y = boardHeight * gridSize;
+    gameScore ++;  
+    score();
+    }
 }
 
 // setInterval(moveApple, 10000);
-
-
+ 
+function score(){
+        document.querySelector('#gameScore').textContent = gameScore;
+}
 
 function moveSnakeHead (){
-        if(snakeHead.moveUp){
-            snakeHead.y -= snakeHead.dy; 
-        } else if(snakeHead.moveDown){
-            snakeHead.y += snakeHead.dy;
-        } else if(snakeHead.moveLeft){
-            snakeHead.x -= snakeHead.dx;
-        } else if(snakeHead.moveRight){
-            snakeHead.x += snakeHead.dx; 
-        }
+        snakeHead.y += snakeHead.dy; 
+        snakeHead.x += snakeHead.dx;
+        moveApple();
         detectWalls(); 
 }
 
@@ -110,12 +105,38 @@ function detectWalls(){
     if(snakeHead.x < 0 || snakeHead.x + gridSize > canvas.width){
         snakeHead.dx = 0;
     }
-
     if(snakeHead.y < 0 || snakeHead.y + gridSize > canvas.height){
         snakeHead.dy = 0;
     }
+    if(snakeHead.dx === 0 && snakeHead.dy === 0){
+        gameOver = true;
+    }
+
 }
 
+function resetGame(){
+    gameScore = 0;
+    appleLocation.x = 360;
+    appleLocation.y = 320;
+    snakeHead.x = 160;
+    snakeHead.y = 120; 
+    snakeHead.dy = 2;
+}
+
+function playAgainScreen(){
+    
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(60, 170, 480, 250); 
+    
+    ctx.fillStyle = 'maroon';  
+    ctx.font ='bold 30px Arial';
+    ctx.fillText("PLAY SOME MORE?", 150, 250);
+
+    ctx.fillStyle = 'aqua';
+    ctx.font ='25px Arial';
+    ctx.fillText("< --- When ready, press SPACEBAR --- >", 70,350);
+   
+}
 // debugger;
 
 function checkTurningPoints(X){
@@ -123,60 +144,76 @@ function checkTurningPoints(X){
     const highValue = gridSize;
     quadrant = Math.ceil(X/ gridSize); 
  
-    let turnLocation = ((quadrant * gridSize) - X);
- 
+    let turnLocation = ((quadrant * gridSize) - X);  
     if(turnLocation > lowValue && turnLocation < highValue){ 
-            return true;
-        }   
-}
-
-
-function verticalControl(){
-        if (checkTurningPoints(snakeHead.x)){
-            snakeHead.dx = 0;
-            snakeHead.dy = +snakeHead.speed;
-            snakeHead.x = quadrant * gridSize; 
-            snakeHead.moveLeft = false;
-            snakeHead.moveRight = false; 
-        } 
-}    
-    
-function horizontalControl(){
-        if(checkTurningPoints(snakeHead.y)){
-            snakeHead.dy = 0;
-            snakeHead.dx = +snakeHead.speed;
-            snakeHead.y = quadrant * gridSize; 
-            snakeHead.moveUp = false;
-            snakeHead.moveDown = false;
-        }
-}
-
-
-function arrowKeys(e){
-    if (e.key === 'ArrowUp'){
-            if(!snakeHead.moveDown){
-                snakeHead.moveUp = true;
-                snakeHead.dx = 0;
-                console.log('im here');
-                verticalControl();
-            }
-    } else if (e.key === 'ArrowDown'){
-            if(!snakeHead.moveUp){
-                snakeHead.moveDown = true;
-                verticalControl();
-            }
-    } else if (e.key === 'ArrowLeft'){
-            if(!snakeHead.moveRight){        
-                snakeHead.moveLeft = true;
-                horizontalControl();
-            }
-    } else if (e.key === 'ArrowRight'){
-                
-            if(!snakeHead.moveLeft){
-                snakeHead.moveRight = true;
-                horizontalControl();
-            }
+        return true;
     }
+} 
+
+
+function arrowKeysAction(e){
+    switch(e.key){
+        case 'ArrowUp':
+            if(snakeHead.dy === 0){
+                if (checkTurningPoints(snakeHead.x)){
+                    if(snakeHead.dx === -snakeHead.speed){   
+                    snakeHead.x = (quadrant - 1) * gridSize; 
+                    snakeHead.dx = 0;
+                    snakeHead.dy = -snakeHead.speed;
+                } else if(snakeHead.dx === +snakeHead.speed){
+                    snakeHead.x = quadrant * gridSize;  
+                    snakeHead.dx = 0;
+                    snakeHead.dy = -snakeHead.speed;
+                    }
+                }
+            }     
+            break;
+        case 'ArrowDown':
+            if(snakeHead.dy === 0){
+                if (checkTurningPoints(snakeHead.x)){
+                    if(snakeHead.dx === -snakeHead.speed){   
+                    snakeHead.x = (quadrant - 1) * gridSize; 
+                    snakeHead.dx = 0;
+                    snakeHead.dy = +snakeHead.speed;
+                } else if(snakeHead.dx === snakeHead.speed){
+                    snakeHead.x = quadrant * gridSize; 
+                    snakeHead.dx = 0;
+                    snakeHead.dy = +snakeHead.speed;
+                     }
+                }
+            }     
+            break;
+        case 'ArrowLeft':
+            if(snakeHead.dx === 0){
+                if (checkTurningPoints(snakeHead.y)){
+                    if(snakeHead.dy === -snakeHead.speed){
+                    snakeHead.y = (quadrant - 1) * gridSize; 
+                    snakeHead.dy = 0;
+                    snakeHead.dx = -snakeHead.speed;
+                } else if(snakeHead.dy === +snakeHead.speed){
+                    snakeHead.y = quadrant * gridSize; 
+                    snakeHead.dy = 0;
+                    snakeHead.dx = -snakeHead.speed;
+                    }
+                }
+            }    
+            break;
+        case 'ArrowRight':
+            if(snakeHead.dx === 0){
+                if (checkTurningPoints(snakeHead.y)){
+                    if(snakeHead.dy === -snakeHead.speed){
+                    snakeHead.y = (quadrant - 1) * gridSize;
+                    snakeHead.dy = 0;
+                    snakeHead.dx = +snakeHead.speed;
+                } else if(snakeHead.dy === +snakeHead.speed){
+                    snakeHead.y = quadrant * gridSize; 
+                    snakeHead.dy = 0;
+                    snakeHead.dx = +snakeHead.speed;
+                    }
+                }
+            }
+            break;
+    }            
 }
 
 
@@ -185,21 +222,32 @@ function clearAll(){
 }
 
 function playGame(){
+    if(gameOver){
+        resetGame();
+        playAgainScreen();
+        return;
+    }
     clearAll();
 
     drawGameBoard();
-    // drawApple();
+    drawApple();
     drawSnakeHead();
     moveSnakeHead(); 
     requestAnimationFrame(playGame); 
 }
 
-document.addEventListener('keydown', arrowKeys);
+document.addEventListener('keydown', arrowKeysAction);
 
  
 window.onload = () => {
     // createLocalStorage();
     drawGameBoard();
     startScreen();
+    
+    document.addEventListener('keyup', (e) => { 
+        if(e.key === ' ' || e.key === 'Space'){
+        gameOver = false;
+        playGame();
+        } 
+    });
   }
-
