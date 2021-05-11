@@ -29,13 +29,15 @@ class SnakeSegment {
     }
 
     createInitialBody(x,y){
-        if(!snakeBody.length){
-            for (let i=1; i<4; i++){
-                this.x = x; 
-                this.y -= gridSize;
-                snakeBody.push(this.x,this.y);
-            }    
-        }
+        this.x = x;
+        this.y = y;
+ 
+        snakeBody = [];
+        for (let i=1; i<4; i++){
+            this.x = x; 
+            this.y -= gridSize;
+            snakeBody.push(this.x,this.y);
+        }    
     }
     // addSegment(){
 
@@ -43,9 +45,6 @@ class SnakeSegment {
 }
 
 let initialBody = new SnakeSegment(snakeHead.x, snakeHead.y, snakeHead.dx, snakeHead.dy);
-
-initialBody.createInitialBody(snakeHead.x, snakeHead.y);
-console.log(snakeBody);
 
 
 function drawApple() { 
@@ -61,11 +60,8 @@ function drawSnakeHead() {
 }
 
 function drawSnakeSegment(){
-// console.log(snakeBody[5]);
-
     ctx.fillStyle =  '#ffd900';
     ctx.fillRect(snakeBody[4] + 3, snakeBody[5] + 3, outerSegmentSize, outerSegmentSize);
-    // console.log(snakeBody[4] - 3, snakeBody[5] - 83, outerSegmentSize, outerSegmentSize);
     ctx.fillStyle =  '#469223';
     ctx.fillRect(snakeBody[4] + 6, snakeBody[5] + 6, innerSegmentSize, innerSegmentSize);
     ctx.fillStyle =  '#ffd900';
