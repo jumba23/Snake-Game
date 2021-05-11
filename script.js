@@ -2,10 +2,12 @@ const canvas = document.getElementById('game-board');
 const ctx = canvas.getContext('2d');
 
 const gridSize = 40;
+const outerSegmentSize = 34;
+const innerSegmentSize = 28; 
 let quadrant = 0;
 let gameScore = 0;
 let gameOver = false;
-
+let snakeBody = [];
 
 const appleLocation = {
     x: 360,
@@ -20,6 +22,32 @@ const snakeHead = {
     dy: 2,
 }
 
+class SnakeSegment {
+    constructor(x, y){
+            this.x = x;
+            this.y = y;
+    }
+
+    createInitialBody(x,y){
+        if(!snakeBody.length){
+            for (let i=1; i<4; i++){
+                this.x = x; 
+                this.y -= gridSize;
+                snakeBody.push(this.x,this.y);
+            }    
+        }
+    }
+    // addSegment(){
+
+    // }    
+}
+
+let initialBody = new SnakeSegment(snakeHead.x, snakeHead.y, snakeHead.dx, snakeHead.dy);
+
+initialBody.createInitialBody(snakeHead.x, snakeHead.y);
+console.log(snakeBody);
+
+
 function drawApple() { 
     const apple = document.getElementById("apple");
        apple.style.display = 'show'; 
@@ -30,6 +58,25 @@ function drawSnakeHead() {
     const snake = document.getElementById("snake-head");
     snake.style.display = 'show'; 
     ctx.drawImage(snake, snakeHead.x, snakeHead.y);
+}
+
+function drawSnakeSegment(){
+// console.log(snakeBody[5]);
+
+    ctx.fillStyle =  '#ffd900';
+    ctx.fillRect(snakeBody[4] + 3, snakeBody[5] + 3, outerSegmentSize, outerSegmentSize);
+    // console.log(snakeBody[4] - 3, snakeBody[5] - 83, outerSegmentSize, outerSegmentSize);
+    ctx.fillStyle =  '#469223';
+    ctx.fillRect(snakeBody[4] + 6, snakeBody[5] + 6, innerSegmentSize, innerSegmentSize);
+    ctx.fillStyle =  '#ffd900';
+    ctx.fillRect(snakeBody[2] + 3, snakeBody[3] + 3, outerSegmentSize, outerSegmentSize);
+    ctx.fillStyle =  '#469223';
+    ctx.fillRect(snakeBody[2] + 6, snakeBody[3] + 6, innerSegmentSize, innerSegmentSize);
+    ctx.fillStyle =  '#ffd900';
+    ctx.fillRect(snakeBody[0] + 3, snakeBody[1] + 3, outerSegmentSize, outerSegmentSize);
+    ctx.fillStyle =  '#469223';
+    ctx.fillRect(snakeBody[0] + 6, snakeBody[1] + 6, innerSegmentSize, innerSegmentSize);
+
 }
 
 function startScreen(){
@@ -97,8 +144,36 @@ function score(){
 function moveSnakeHead (){
         snakeHead.y += snakeHead.dy; 
         snakeHead.x += snakeHead.dx;
+        moveSnakeBody();
         moveApple();
         detectWalls(); 
+}
+
+function moveSnakeBody(){
+    if(snakeHead.dy > 0){
+        
+        initialBody.createInitialBody(snakeHead.x, snakeHead.y);
+    }
+    // } else if(snakeHead.dx > 0){
+    //     if(snakeSegment.y === snakeHead.y - gridSize){
+    //         console.log(snakeSegment.y);
+    //         console.log(snakeHead.y);
+    //         snakeSegment.dy = 0;  
+    //         snakeSegment.dx = snakeHead.dx;
+    //         snakeSegment.x = snakeHead.x - gridSize;
+    //         console.log('TURN RIGHT');
+
+    //     } else{
+    //        do {
+    //             snakeSegment.y = snakeHead.y;
+    //             snakeSegment.dy = 0;
+    //             snakeSegment.dx = snakeHead.dx;
+    //             snakeSegment.x = snakeHead.x - gridSize;
+    //         } while(snakeSegment.y === snakeSegment.y - gridSize);
+    //         console.log('im here');}
+ 
+    // }
+
 }
 
 function detectWalls(){
@@ -232,6 +307,7 @@ function playGame(){
     drawGameBoard();
     drawApple();
     drawSnakeHead();
+    drawSnakeSegment();
     moveSnakeHead(); 
     requestAnimationFrame(playGame); 
 }
