@@ -2,63 +2,31 @@ const canvas = document.getElementById('game-board');
 const ctx = canvas.getContext('2d');
 
 const gridSize = 40;
-const outerSegmentSize = 34;
-const innerSegmentSize = 28; 
-let quadrant = 0;
 let gameScore = 0;
 let gameOver = false;
-let numberOfSegments = 3;
-let snakeBody = [];
-
 
 const appleLocation = {
     x: 360,
     y: 320
 }
 
-const snakeHead = {
-    x: 160,
-    y: 120,
-    speed: 2,
+const snake = {
+    body: [
+        {x: 160, y: 120},
+        {x: 160, y: 80},
+        {x: 160, y: 40}
+    ],
+    speed: 40,
     dx: 0,
-    dy: 2,
-}
+    dy: 40,
+} 
 
-const snakeSegment = {
-    x: snakeHead.x,
-    y: snakeHead.y,
-    dx: 0,
-    dy: 2
+class snakeSegment  {
+    constructor(x, y){
+        this.x = x;
+        this.y = y;
+    }
 }
-
-function createInitialBody(){
-        snakeBody = [];   
-        for (let i=1; i<numberOfSegments + 1; i++){
-            snakeSegment.x = snakeHead.x
-            snakeSegment.y = snakeHead.y;
-        
-            if(snakeHead.dx === 0){
-                    if(snakeHead.dy > 0){
-                        snakeSegment.y = snakeHead.y - i*gridSize; 
-            
-                    } else {
-                        snakeSegment.y = snakeHead.y + i*gridSize;
-                    }
-            } 
-                else if (snakeHead.dy === 0){
-                    
-                        if (snakeHead.dx > 0 ){
-                        snakeSegment.x = snakeHead.x - i*gridSize; 
-                        
-                        } else {
-                        snakeSegment.x = snakeHead.x + i*gridSize;
-                         }
-                    } 
-                  
-            snakeBody.push(snakeSegment.x, snakeSegment.y);
-        }
-}
-
 
 function drawApple() { 
     const apple = document.getElementById("apple");
@@ -66,18 +34,18 @@ function drawApple() {
     ctx.drawImage(apple, appleLocation.x, appleLocation.y);
 }
 
-function drawSnakeHead() {
-    const snake = document.getElementById("snake-head");
-    snake.style.display = 'show'; 
-    ctx.drawImage(snake, snakeHead.x, snakeHead.y);
-}
+function drawSnake(){
+    const snakeImage = document.getElementById("snake-head");
+    const outerSegmentSize = 34;
+    const innerSegmentSize = 28;
+    snakeImage.style.display = 'show'; 
+    ctx.drawImage(snakeImage, snake.body[0].x, snake.body[0].y);
 
-function drawSnakeSegment(){
-    for (i=0; i < snakeBody.length ; i += 2){
-    ctx.fillStyle =  '#ffd900';
-    ctx.fillRect(snakeBody[i] + 3, snakeBody[i + 1] + 3, outerSegmentSize, outerSegmentSize);
-    ctx.fillStyle =  '#469223';
-    ctx.fillRect(snakeBody[i] + 6, snakeBody[i + 1] + 6, innerSegmentSize, innerSegmentSize);
+    for (let i=1; i < snake.body.length ; i ++){
+            ctx.fillStyle =  '#ffd900';
+            ctx.fillRect(snake.body[i].x + 3, snake.body[i].y + 3, outerSegmentSize, outerSegmentSize);
+            ctx.fillStyle =  '#469223';
+            ctx.fillRect(snake.body[i].x + 6, snake.body[i].y + 6, innerSegmentSize, innerSegmentSize);
     }
 }
 
@@ -123,9 +91,8 @@ function drawGameBoard(){
 }
 
 
-function moveApple(){
-    
-    if((snakeHead.x >= appleLocation.x - 10 && appleLocation.x + 10 >= snakeHead.x) && (snakeHead.y >= appleLocation.y - 10 && appleLocation.y + 10 >= snakeHead.y)){
+function moveApple(){  
+    if((snake.body[0].x >= appleLocation.x - 10 && appleLocation.x + 10 >= snake.body[0].x) && (snake.body[0].y >= appleLocation.y - 10 && appleLocation.y + 10 >= snake.body[0].y)){
 
     const boardWidth = Math.floor(Math.random() * 15);
     const boardHeight = Math.floor(Math.random() * 13);
@@ -133,47 +100,37 @@ function moveApple(){
     appleLocation.x = boardWidth * gridSize;
     appleLocation.y = boardHeight * gridSize;
     gameScore ++; 
-    numberOfSegments ++;
     score();
+    growSnake();
     }
 }
-
 
 function score(){
-        document.querySelector('#gameScore').textContent = gameScore;
+    document.querySelector('#gameScore').textContent = gameScore;
 }
 
-function moveSnakeHead (){
-        snakeHead.y += snakeHead.dy; 
-        snakeHead.x += snakeHead.dx;
-
-        moveSnakeBody();
-        moveApple();
-        detectWalls(); 
+function moveSnake(){
+    const snakeHead = snake.body.pop();
+    snakeHead.x = snake.body[0].x + snake.dx;
+    snakeHead.y = snake.body[0].y + snake.dy;
+    snake.body.unshift(snakeHead);
+    moveApple();
+    detectWalls(); 
 }
 
-function moveSnakeBody(){
-    if(snakeHead.dy === 0 || snakeHead.dx === 0){
-        createInitialBody(snakeHead.x, snakeHead.y);
-        // if(checkTurningPoints(snakeHead.x)){
-        //  initialSnakeBody.completeBodyTurn(snakeHead.x, snakeHead.y);
-        //  return;
-        // }
-        
-     
-
-        
-    }
-}     
-
+function growSnake(){
+    const newSegment = new snakeSegment(snake.body[1].x, snake.body[1].y, gridSize);
+    return snake.body.push(newSegment);  
+ }
+ 
 function detectWalls(){
-    if(snakeHead.x < 0 || snakeHead.x + gridSize > canvas.width){
-        snakeHead.dx = 0;
+    if(snake.body[0].x < 0 || snake.body[0].x + gridSize > canvas.width){
+        snake.dx = 0;
     }
-    if(snakeHead.y < 0 || snakeHead.y + gridSize > canvas.height){
-        snakeHead.dy = 0;
+    if(snake.body[0].y < 0 || snake.body[0].y + gridSize > canvas.height){
+        snake.dy = 0;
     }
-    if(snakeHead.dx === 0 && snakeHead.dy === 0){
+    if(snake.dx === 0 && snake.dy === 0){
         gameOver = true;
     }
 
@@ -183,9 +140,10 @@ function resetGame(){
     gameScore = 0;
     appleLocation.x = 360;
     appleLocation.y = 320;
-    snakeHead.x = 160;
-    snakeHead.y = 120; 
-    snakeHead.dy = 2;
+    snake.body[0].x = 160; 
+    snake.body[0].y = 120;   
+    snake.dy = 40;
+    snake.body.length = 3;
 }
 
 function playAgainScreen(){
@@ -202,83 +160,37 @@ function playAgainScreen(){
     ctx.fillText("< --- When ready, press SPACEBAR --- >", 70,350);
    
 }
-function checkTurningPoints(X){
-    const lowValue = 0;
-    const highValue = gridSize;
-    quadrant = Math.ceil(X/ gridSize); 
- 
-    let turnLocation = ((quadrant * gridSize) - X);  
-    if(turnLocation > lowValue && turnLocation < highValue){ 
-        return true;
-    }
-} 
 
 
 function arrowKeysAction(e){
     switch(e.key){
         case 'ArrowUp':
-            if(snakeHead.dy === 0){
-                if (checkTurningPoints(snakeHead.x)){
-                    if(snakeHead.dx === -snakeHead.speed){   
-                    snakeHead.x = (quadrant - 1) * gridSize; 
-                    snakeHead.dx = 0;
-                    snakeHead.dy = -snakeHead.speed;
-                } else if(snakeHead.dx === +snakeHead.speed){
-                    snakeHead.x = quadrant * gridSize;  
-                    snakeHead.dx = 0;
-                    snakeHead.dy = -snakeHead.speed;
-                    }
-                }
-            }     
+            if(snake.dx != 0){
+                snake.dx = 0;
+                snake.dy = -snake.speed;
+            }
             break;
         case 'ArrowDown':
-            if(snakeHead.dy === 0){
-                if (checkTurningPoints(snakeHead.x)){
-                    if(snakeHead.dx === -snakeHead.speed){   
-                    snakeHead.x = (quadrant - 1) * gridSize; 
-                    snakeHead.dx = 0;
-                    snakeHead.dy = +snakeHead.speed;
-                } else if(snakeHead.dx === snakeHead.speed){
-                    snakeHead.x = quadrant * gridSize; 
-                    snakeHead.dx = 0;
-                    snakeHead.dy = +snakeHead.speed;
-                     }
-                }
-            }     
+            if(snake.dx != 0){
+                snake.dx = 0;
+                snake.dy = +snake.speed;
+            }
             break;
         case 'ArrowLeft':
-            if(snakeHead.dx === 0){
-                if (checkTurningPoints(snakeHead.y)){
-                    if(snakeHead.dy === -snakeHead.speed){
-                    snakeHead.y = (quadrant - 1) * gridSize; 
-                    snakeHead.dy = 0;
-                    snakeHead.dx = -snakeHead.speed;
-                } else if(snakeHead.dy === +snakeHead.speed){
-                    snakeHead.y = quadrant * gridSize; 
-                    snakeHead.dy = 0;
-                    snakeHead.dx = -snakeHead.speed;
-                    }
-                }
-            }    
+            if(snake.dy != 0){
+                snake.dy = 0;
+                snake.dx = -snake.speed;
+            }
             break;
         case 'ArrowRight':
-            if(snakeHead.dx === 0){
-                if (checkTurningPoints(snakeHead.y)){
-                    if(snakeHead.dy === -snakeHead.speed){
-                    snakeHead.y = (quadrant ) * gridSize;
-                    snakeHead.dy = 0;
-                    snakeHead.dx = +snakeHead.speed;
-                } else if(snakeHead.dy === +snakeHead.speed){
-                    snakeHead.y = quadrant * gridSize; 
-                    snakeHead.dy = 0;
-                    snakeHead.dx = +snakeHead.speed;
-                    }
-                }
+            if(snake.dy != 0){
+                snake.dy = 0;
+                snake.dx = +snake.speed;
+          
             }
             break;
     }            
 }
-
 
 function clearAll(){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -290,18 +202,19 @@ function playGame(){
         playAgainScreen();
         return;
     }
-    clearAll();
+    setTimeout(() =>{
+        clearAll();
 
-    drawGameBoard();
-    drawApple();
-    drawSnakeHead();
-    drawSnakeSegment();
-    moveSnakeHead(); 
-    requestAnimationFrame(playGame); 
+        drawGameBoard(); 
+        drawApple(); 
+        drawSnake();
+    
+        moveSnake(); 
+        requestAnimationFrame(playGame); 
+    },200)
 }
 
 document.addEventListener('keydown', arrowKeysAction);
-
  
 window.onload = () => {
     // createLocalStorage();
