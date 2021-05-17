@@ -30,7 +30,7 @@ class snakeSegment  {
 
 function drawApple() { 
     const apple = document.getElementById("apple");
-       apple.style.display = 'show'; 
+    apple.style.display = 'show'; 
     ctx.drawImage(apple, appleLocation.x, appleLocation.y);
 }
 
@@ -40,7 +40,6 @@ function drawSnake(){
     const innerSegmentSize = 28;
     snakeImage.style.display = 'show'; 
     ctx.drawImage(snakeImage, snake.body[0].x, snake.body[0].y);
-
     for (let i=1; i < snake.body.length ; i ++){
             ctx.fillStyle =  '#ffd900';
             ctx.fillRect(snake.body[i].x + 3, snake.body[i].y + 3, outerSegmentSize, outerSegmentSize);
@@ -52,18 +51,14 @@ function drawSnake(){
 function startScreen(){
     ctx.fillStyle = 'grey';
     ctx.fillRect(60, 170, 480, 250);
-    
     ctx.fillStyle = '#00ff62';
     ctx.font ='bold 30px Arial';
     ctx.fillText("PRESS SPACEBAR TO START", 80, 250);
-
     ctx.fillStyle = '047c32';
     ctx.font ='15px Arial';
     ctx.fillText("Use ARROWS to move the snake", 80,350);
-
     const arrowsPicture = document.getElementById("arrows");
-    ctx.drawImage(arrowsPicture, 350, 300);  
-    
+    ctx.drawImage(arrowsPicture, 350, 300);   
  }
 
 function drawGameBoard(){
@@ -90,13 +85,10 @@ function drawGameBoard(){
     }
 }
 
-
 function moveApple(){  
     if((snake.body[0].x >= appleLocation.x - 10 && appleLocation.x + 10 >= snake.body[0].x) && (snake.body[0].y >= appleLocation.y - 10 && appleLocation.y + 10 >= snake.body[0].y)){
-
     const boardWidth = Math.floor(Math.random() * 15);
     const boardHeight = Math.floor(Math.random() * 13);
-
     appleLocation.x = boardWidth * gridSize;
     appleLocation.y = boardHeight * gridSize;
     gameScore ++; 
@@ -116,12 +108,22 @@ function moveSnake(){
     snake.body.unshift(snakeHead);
     moveApple();
     detectWalls(); 
+    checkBodyContact();
 }
 
 function growSnake(){
     const newSegment = new snakeSegment(snake.body[1].x, snake.body[1].y, gridSize);
     return snake.body.push(newSegment);  
  }
+
+function checkBodyContact(){
+    for(i=1; i<snake.body.length; i++){
+            if (snake.body[0].x === snake.body[i].x && snake.body[0].y === snake.body[i].y){
+                gameOver = true;
+                resetGame();
+            }
+    }
+}
  
 function detectWalls(){
     if(snake.body[0].x < 0 || snake.body[0].x + gridSize > canvas.width){
@@ -133,34 +135,33 @@ function detectWalls(){
     if(snake.dx === 0 && snake.dy === 0){
         gameOver = true;
     }
-
 }
 
 function resetGame(){
     gameScore = 0;
     appleLocation.x = 360;
     appleLocation.y = 320;
-    snake.body[0].x = 160; 
-    snake.body[0].y = 120;   
+    snake.body[0].x = 160;
+    snake.body[0].y = 120;
+    snake.body[1].x = 160;
+    snake.body[1].y = 80;
+    snake.body[2].x = 160;
+    snake.body[2].y = 40;
     snake.dy = 40;
+    snake.dx = 0;
     snake.body.length = 3;
 }
 
 function playAgainScreen(){
-    
     ctx.fillStyle = 'grey';
     ctx.fillRect(60, 170, 480, 250); 
-    
     ctx.fillStyle = 'maroon';  
     ctx.font ='bold 30px Arial';
     ctx.fillText("PLAY SOME MORE?", 150, 250);
-
     ctx.fillStyle = 'aqua';
     ctx.font ='25px Arial';
     ctx.fillText("< --- When ready, press SPACEBAR --- >", 70,350);
-   
 }
-
 
 function arrowKeysAction(e){
     switch(e.key){
@@ -204,14 +205,12 @@ function playGame(){
     }
     setTimeout(() =>{
         clearAll();
-
         drawGameBoard(); 
         drawApple(); 
-        drawSnake();
-    
+        drawSnake();  
         moveSnake(); 
         requestAnimationFrame(playGame); 
-    },200)
+    },175)
 }
 
 document.addEventListener('keydown', arrowKeysAction);
@@ -220,7 +219,6 @@ window.onload = () => {
     // createLocalStorage();
     drawGameBoard();
     startScreen();
-    
     document.addEventListener('keyup', (e) => { 
         if(e.key === ' ' || e.key === 'Space'){
         gameOver = false;
