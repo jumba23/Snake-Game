@@ -4,10 +4,8 @@ const highScore = JSON.parse(localStorage.getItem('highScore'));
 
 const gridSize = 40;
 let gameScore = 0;
-let gameOver = false;
-
 let localHighScore = 0;
-
+let gameOver = false;
 
 const appleLocation = {
     x: 360,
@@ -90,31 +88,24 @@ function drawGameBoard(){
 }
 
 function moveApple(){  
-    if((snake.body[0].x >= appleLocation.x - 10 && appleLocation.x + 10 >= snake.body[0].x) && (snake.body[0].y >= appleLocation.y - 10 && appleLocation.y + 10 >= snake.body[0].y)){
-        getRadonNumbers();
-        
-        while(snakeBodyCheck == true){
-            getRadonNumbers();
+    if((snake.body[0].x === appleLocation.x && snake.body[0].y === appleLocation.y)){
+        getRadomNumbers();
+        for(i=0; i<snake.body.length; i++){
+                while (snake.body[i].x === appleLocation.x && snake.body[i].y === appleLocation.y){
+                    getRadomNumbers();
+                } 
         }
-
         gameScore ++; 
         growSnake();
-    }
+    }   
+
+   
 }
 
-function snakeBodyCheck(){
-    for(i=0; i<snake.body.length; i++){
-        if (snake.body[i].x === appleLocation.x && snake.body[i].x === appleLocation.x){
-            return true;
-        }
-    }
-}
-
-function getRadonNumbers(){
+function getRadomNumbers(){
     appleLocation.x = Math.floor(Math.random() * 15) * gridSize;
     appleLocation.y = Math.floor(Math.random() * 13) * gridSize;
 }
-
 
 function score(){
     document.querySelector('#gameScore').textContent = gameScore;
@@ -248,7 +239,7 @@ function playGame(){
         moveSnake(); 
         checkGameOver();
         requestAnimationFrame(playGame); 
-    },400)
+    },200)
 }
 
 document.addEventListener('keydown', arrowKeysAction);
