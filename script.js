@@ -1,9 +1,13 @@
 const canvas = document.getElementById('game-board');
 const ctx = canvas.getContext('2d');
+const highScore = JSON.parse(localStorage.getItem('highScore'));
 
 const gridSize = 40;
 let gameScore = 0;
 let gameOver = false;
+
+let localHighScore = 0;
+
 
 const appleLocation = {
     x: 360,
@@ -87,15 +91,30 @@ function drawGameBoard(){
 
 function moveApple(){  
     if((snake.body[0].x >= appleLocation.x - 10 && appleLocation.x + 10 >= snake.body[0].x) && (snake.body[0].y >= appleLocation.y - 10 && appleLocation.y + 10 >= snake.body[0].y)){
-    const boardWidth = Math.floor(Math.random() * 15);
-    const boardHeight = Math.floor(Math.random() * 13);
-    appleLocation.x = boardWidth * gridSize;
-    appleLocation.y = boardHeight * gridSize;
-    gameScore ++; 
-    score();
-    growSnake();
+        getRadonNumbers();
+        
+        while(snakeBodyCheck == true){
+            getRadonNumbers();
+        }
+
+        gameScore ++; 
+        growSnake();
     }
 }
+
+function snakeBodyCheck(){
+    for(i=0; i<snake.body.length; i++){
+        if (snake.body[i].x === appleLocation.x && snake.body[i].x === appleLocation.x){
+            return true;
+        }
+    }
+}
+
+function getRadonNumbers(){
+    appleLocation.x = Math.floor(Math.random() * 15) * gridSize;
+    appleLocation.y = Math.floor(Math.random() * 13) * gridSize;
+}
+
 
 function score(){
     document.querySelector('#gameScore').textContent = gameScore;
@@ -109,6 +128,7 @@ function moveSnake(){
     moveApple();
     detectWalls(); 
     checkBodyContact();
+    score();
 }
 
 function growSnake(){
@@ -193,8 +213,25 @@ function arrowKeysAction(e){
     }            
 }
 
+function createLocalStorage() {
+    if (highScore === null) {
+        localStorage.setItem('localHighScore', JSON.stringify(localHighScore));
+    }
+}
+
 function clearAll(){
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function checkGameOver(){
+    if(gameOver){
+        if(gameScore > localHighScore){
+            localHighScore = gameScore;
+            document.querySelector('#highScore').textContent = localHighScore;
+            localStorage.setItem('localHighScore', JSON.stringify(localHighScore));
+        }
+    localStorage.setItem('localHighScore', JSON.stringify(localHighScore)) 
+    }
 }
 
 function playGame(){
@@ -209,14 +246,15 @@ function playGame(){
         drawApple(); 
         drawSnake();  
         moveSnake(); 
+        checkGameOver();
         requestAnimationFrame(playGame); 
-    },175)
+    },400)
 }
 
 document.addEventListener('keydown', arrowKeysAction);
  
 window.onload = () => {
-    // createLocalStorage();
+    createLocalStorage();
     drawGameBoard();
     startScreen();
     document.addEventListener('keyup', (e) => { 
