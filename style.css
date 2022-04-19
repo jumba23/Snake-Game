@@ -1,45 +1,44 @@
-body, html{
-    margin-top: 2%;
-    background-image: url("Background-snake\ game.jpg");
-    background-repeat: none;
-    width: auto;
+body,
+html {
+  margin-top: 2%;
+  background-image: url("./images/background-snake\ game.jpg");
+  background-repeat: none;
+  width: auto;
 }
 
 #container {
-    display: flex;
-    justify-content: center;
-
+  display: flex;
+  justify-content: center;
 }
 
-h2{
-    text-align: center;
-    color: aqua;
-    font-size: 45px;
+h2 {
+  text-align: center;
+  color: aqua;
+  font-size: 45px;
 }
 
-#score{
-    opacity: 0.8;
-    border: 2px solid rgb(247, 5, 5);
-    margin: auto;
-    width: 600px;
-    color: aqua;
-    background-color: brown;
-    padding: 10px 0px 10px 0px;
-    display: flex;
-    font-weight: bold;
-    font-size: 20px;
+#score {
+  opacity: 0.8;
+  border: 2px solid rgb(247, 5, 5);
+  margin: auto;
+  width: 600px;
+  color: aqua;
+  background-color: brown;
+  padding: 10px 0px 10px 0px;
+  display: flex;
+  font-weight: bold;
+  font-size: 20px;
 }
 
-label[for="highScore"]{
-    margin-left: auto;
-    }
-
-span{
-    padding-left: 30px;
+label[for="highScore"] {
+  margin-left: auto;
 }
 
-canvas{
-    opacity: 0.7;
-    background-color: #070707;
-    margin-bottom: 5px;
+span {
+  padding-left: 30px;
+}
+
+canvas {
+  background-color: #070707;
+  margin-bottom: 5px;
 }
