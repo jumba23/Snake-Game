@@ -1,7 +1,7 @@
 # Snake Game
 Simple and famous Snake Game. Written using HTML, CSS, and Javascript languages. In this application, I was working on improving my knowledge of canvas elements.
 
-### Try It - [here](https://jumba23.github.io/Snake-Game/)
+### Try it - [here](https://jumba23.github.io/Snake-Game/)
 
 # Application 
 <p align="center">
