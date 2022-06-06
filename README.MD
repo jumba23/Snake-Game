@@ -16,4 +16,4 @@ Simple and famous Snake Game. Written using HTML, CSS, and Javascript languages.
 While working on the game, I felt pretty comfortable using JavaScript functions, arrays, and canvas. This was my first application where I was using classes and objects. Writing the game and working on individual parts was definitely challenging but not frustrating. It provided me with an opportunity to learn new things and approach some old problem-solving techniques with new concepts.
 
 # About Me
-Goran Cvetic - Software Developer - [LinkedIn](https://www.linkedin.com/in/goran-cvetic-9aaa4288/)
+Goran Cvetic - Software Developer - [LinkedIn](https://www.linkedin.com/in/goran-cvetic/)
